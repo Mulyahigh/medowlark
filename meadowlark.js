@@ -1,5 +1,7 @@
 const express = require("express");
 const expressHandlebars = require("express3-handlebars");
+
+const fortune = require("./lib/fortune");
 const app = express();
 
 app.engine(
@@ -12,18 +14,9 @@ app.set("view engine", "handlebars");
 
 const port = process.env.PORT || 3000;
 
-const fortunes = [
-  "Победи свои страхи, или они победят тебя.",
-  "Рекам нужны истоки.",
-  "Не бойся неведомого.",
-  "Тебя ждет приятный сюрприз.",
-  "Будь проще везде, где только можно.",
-];
-
 app.get("/", (req, res) => res.render("home"));
 app.get("/about", (req, res) => {
-  const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
-  res.render("about", { fortune: randomFortune });
+  res.render("about", { fortune: fortune.getFortune() });
 });
 app.use(express.static(__dirname + "/public"));
 console.log(__dirname);
