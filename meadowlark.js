@@ -3,15 +3,22 @@ const expressHandlebars = require("express3-handlebars");
 
 const handlers = require("./lib/handlers");
 const app = express();
-
+app.disable("x-powered-by");
 app.engine(
   "handlebars",
   expressHandlebars({
     defaultLayout: "main",
+    helpers: {
+      section: function (name, options) {
+        if (!this._sections) this._sections = {};
+        this._sections[name] = options.fn(this);
+        return null;
+      },
+    },
   })
 );
 app.set("view engine", "handlebars");
-console.log("err");
+
 const port = process.env.PORT || 3000;
 
 app.get("/", handlers.home);
