@@ -1,7 +1,7 @@
 const express = require("express");
 const expressHandlebars = require("express3-handlebars");
 
-const fortune = require("./lib/fortune");
+const handlers = require("./lib/handlers");
 const app = express();
 
 app.engine(
@@ -11,30 +11,26 @@ app.engine(
   })
 );
 app.set("view engine", "handlebars");
-
+console.log("err");
 const port = process.env.PORT || 3000;
 
-app.get("/", (req, res) => res.render("home"));
-app.get("/about", (req, res) => {
-  res.render("about", { fortune: fortune.getFortune() });
-});
-app.use(express.static(__dirname + "/public"));
-console.log(__dirname);
-// Пользовательская страница 404
-app.use((req, res) => {
-  res.status(404);
-  res.render("404");
-});
-// Пользовательская страница 500
-app.use((err, req, res, next) => {
-  console.error(err.message);
-  res.status(500);
-  res.render("500");
-});
+app.get("/", handlers.home);
 
-app.listen(port, () =>
-  console.log(
-    `Express запущен на http://localhost:${port}; ` +
-      `нажмите Ctrl+C для завершения.`
-  )
-);
+app.get("/about", handlers.about);
+
+app.use(express.static(__dirname + "/public"));
+
+app.use(handlers.notFound);
+
+app.use(handlers.serverError);
+
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(
+      `Express запущен на http://localhost:${port}` +
+        "; нажмите Ctrl+C для завершения."
+    );
+  });
+} else {
+  module.exports = app;
+}
